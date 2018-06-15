@@ -16,6 +16,8 @@
 				var options = [];
 				var selectedValue = t.attr('data-value').split(',');
 				var required = ~~t.attr('data-required');
+				var sorted = ~~t.attr('data-sort');
+				var sortOrder = [];
 
 				if (required) {
 					t.empty();
@@ -30,9 +32,17 @@
 						o.attr('selected', 'selected');
 					}
 
-					options.push(o);
+					options[d.text] = o;
+					sortOrder.push(d.text);
 				});
-				t.append(options);
+
+				if (sorted) {
+					sortOrder.sort();
+				}
+
+				for (var i = 0; i < sortOrder.length; i ++) {
+					t.append(options[sortOrder[i]]);
+				}
 			}
 		});
 	};

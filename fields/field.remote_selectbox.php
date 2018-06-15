@@ -179,14 +179,13 @@
 			$label->setValue(__('%s Allow selection of multiple options', array($input->generate())));
 			$div->appendChild($label);
 
-			// Sort options?
-			/*$label = Widget::Label();
+			// Sort options
+			$label = Widget::Label();
 			$label->setAttribute('class', 'column');
 			$input = Widget::Input('fields['.$this->get('sortorder').'][sort_options]', 'yes', 'checkbox');
 			if($this->get('sort_options') == 'yes') $input->setAttribute('checked', 'checked');
 			$label->setValue(__('%s Sort all options alphabetically', array($input->generate())));
 			$div->appendChild($label);
-			$wrapper->appendChild($div);*/
 
 			$this->appendShowColumnCheckbox($div);
 			$this->appendRequiredCheckbox($div);
@@ -249,6 +248,7 @@
 			$select->setAttribute('data-value', implode(',',$value));
 			$select->setAttribute('data-url', $this->get('data_url'));
 			$select->setAttribute('data-required', $this->get('required') == 'yes');
+			$select->setAttribute('data-sort', $this->get('sort_options') == 'yes');
 
 			$label->appendChild($select);
 
