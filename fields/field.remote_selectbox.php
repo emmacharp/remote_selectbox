@@ -6,7 +6,7 @@
 
 	require_once FACE . '/interface.exportablefield.php';
 	require_once FACE . '/interface.importablefield.php';
-	
+
 	require_once(EXTENSIONS . '/remote_selectbox/extension.driver.php');
 
 	/**
@@ -64,47 +64,86 @@
 	-------------------------------------------------------------------------*/
 
 		const TABLE_NAME = 'sym_fields_remote_selectbox';
-	
+
 		public function createTable(){
-			return Symphony::Database()->query("
-				CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
-				  `id` int(11) unsigned NOT NULL auto_increment,
-				  `entry_id` int(11) unsigned NOT NULL,
-				  `handle` varchar(255) default NULL,
-				  `value` varchar(255) default NULL,
-				  PRIMARY KEY  (`id`),
-				  UNIQUE KEY `entry_id` (`entry_id`),
-				  KEY `handle` (`handle`),
-				  KEY `value` (`value`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-			");
+			return Symphony::Database()
+				->create('tbl_entries_data_' . $this->get('id'))
+				->ifNotExists()
+				->charset('utf8')
+				->collate('utf8_unicode_ci')
+				->fields([
+					'id' => [
+						'type' => 'int(11)',
+						'auto' => true,
+					],
+					'entry_id' => 'int(11)',
+					'handle' => [
+						'type' => 'varchar(255)',
+						'null' => true,
+					],
+					'value' => [
+						'type' => 'varchar(255)',
+						'null' => true,
+					],
+				])
+				->keys([
+					'id' => 'primary',
+					'entry_id' => 'unique',
+					'handle' => 'key',
+					'value' => 'key',
+				])
+				->execute()
+				->success();
 		}
-		
+
 		public static function createFieldTable() {
-			return Symphony::Database()->query("
-				CREATE TABLE IF NOT EXISTS `" . self::TABLE_NAME . "` (
-				  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-				  `field_id` int(11) unsigned NOT NULL,
-				  `data_url` text COLLATE utf8_unicode_ci,
-				  `allow_multiple_selection` enum('yes','no') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no',
-				  `sort_options` enum('yes','no') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no',
-				  PRIMARY KEY (`id`),
-				  UNIQUE KEY `field_id` (`field_id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-			");
+			return Symphony::Database()
+				->create(self::TABLE_NAME)
+				->ifNotExists()
+				->charset('utf8')
+				->collate('utf8_unicode_ci')
+				->fields([
+					'id' => [
+						'type' => 'int(11)',
+						'auto' => true,
+					],
+					'field_id' => 'int(11)',
+					'data_url' => [
+						'type' => 'text',
+						'null' => true,
+					],
+					'allow_multiple_selection' => [
+						'type' => 'enum',
+						'values' => ['yes','no'],
+						'default' => 'no',
+					],
+					'sort_options' => [
+						'type' => 'enum',
+						'values' => ['yes','no'],
+						'default' => 'no',
+					],
+				])
+				->keys([
+					'id' => 'primary',
+					'field_id' => 'unique',
+				])
+				->execute()
+				->success();
 		}
-		
+
 		public static function deleteFieldTable() {
-			return Symphony::Database()->query("
-				DROP TABLE IF EXISTS `" . self::TABLE_NAME . "
-			");
+			return Symphony::Database()
+				->drop(self::TABLE_NAME)
+				->ifExists()
+				->execute()
+				->success();
 		}
 
 	/*-------------------------------------------------------------------------
 		Utilities:
 	-------------------------------------------------------------------------*/
 
-		
+
 
 	/*-------------------------------------------------------------------------
 		Settings:
@@ -126,10 +165,10 @@
 			$input = Widget::Input('fields['.$this->get('sortorder').'][data_url]', General::sanitize($this->get('data_url')));
 			$label->appendChild($input);
 			$div->appendChild($label);
-			
+
 			if(isset($errors['data_url'])) $wrapper->appendChild(Widget::Error($div, $errors['data_url']));
 			else $wrapper->appendChild($div);
-			
+
 			$div = new XMLElement('div', NULL, array('class' => 'two columns'));
 
 			// Allow selection of multiple items
@@ -161,7 +200,7 @@
 			if($this->get('data_url') == '') {
 				$errors['data_url'] = __('The data url is required.');
 			}
-			
+
 			parent::checkFields($errors, $checkForDuplicates);
 		}
 
@@ -188,37 +227,37 @@
 		public function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null){
 			//$states = $this->getToggleStates();
 			$value = isset($data['value']) ? $data['value'] : null;
-			
+
 			if(!is_array($value)) $value = array($value);
-			
+
 			$options = array(
 				array(null, false, null)
 			);
-			
+
 			/*foreach($states as $handle => $v){
 				$options[] = array(General::sanitize($v), in_array($v, $value), General::sanitize($v));
 			}*/
-			
+
 			$fieldname = 'fields'.$fieldnamePrefix.'['.$this->get('element_name').']'.$fieldnamePostfix;
-			
+
 			if($this->get('allow_multiple_selection') == 'yes') {
 				$fieldname .= '[]';
 			}
-			
+
 			$label = Widget::Label($this->get('label'));
-			
+
 			if($this->get('required') != 'yes') {
 				$label->appendChild(new XMLElement('i', __('Optional')));
 			}
-			
+
 			$select = Widget::Select($fieldname, $options, ($this->get('allow_multiple_selection') == 'yes' ? array('multiple' => 'multiple', 'size' => count($options)) : NULL));
-			
+
 			$select->setAttribute('data-value', implode(',',$value));
 			$select->setAttribute('data-url', $this->get('data_url'));
 			$select->setAttribute('data-required', $this->get('required') == 'yes');
-			
+
 			$label->appendChild($select);
-			
+
 			if($flagWithError != null) $wrapper->appendChild(Widget::Error($label, $flagWithError));
 			else $wrapper->appendChild($label);
 		}
