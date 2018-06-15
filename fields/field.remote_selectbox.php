@@ -88,7 +88,7 @@
 				])
 				->keys([
 					'id' => 'primary',
-					'entry_id' => 'unique',
+					'entry_id' => 'key',
 					'handle' => 'key',
 					'value' => 'key',
 				])
@@ -172,12 +172,12 @@
 			$div = new XMLElement('div', NULL, array('class' => 'two columns'));
 
 			// Allow selection of multiple items
-			/*$label = Widget::Label();
+			$label = Widget::Label();
 			$label->setAttribute('class', 'column');
 			$input = Widget::Input('fields['.$this->get('sortorder').'][allow_multiple_selection]', 'yes', 'checkbox');
 			if($this->get('allow_multiple_selection') == 'yes') $input->setAttribute('checked', 'checked');
 			$label->setValue(__('%s Allow selection of multiple options', array($input->generate())));
-			$div->appendChild($label);*/
+			$div->appendChild($label);
 
 			// Sort options?
 			/*$label = Widget::Label();
@@ -188,7 +188,6 @@
 			$div->appendChild($label);
 			$wrapper->appendChild($div);*/
 
-			$div = new XMLElement('div', NULL, array('class' => 'two columns'));
 			$this->appendShowColumnCheckbox($div);
 			$this->appendRequiredCheckbox($div);
 			$wrapper->appendChild($div);
@@ -225,7 +224,6 @@
 	-------------------------------------------------------------------------*/
 
 		public function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null){
-			//$states = $this->getToggleStates();
 			$value = isset($data['value']) ? $data['value'] : null;
 
 			if(!is_array($value)) $value = array($value);
@@ -233,10 +231,6 @@
 			$options = array(
 				array(null, false, null)
 			);
-
-			/*foreach($states as $handle => $v){
-				$options[] = array(General::sanitize($v), in_array($v, $value), General::sanitize($v));
-			}*/
 
 			$fieldname = 'fields'.$fieldnamePrefix.'['.$this->get('element_name').']'.$fieldnamePostfix;
 
@@ -264,22 +258,13 @@
 
 		public function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=NULL){
 			$status = self::__OK__;
+			$result = array();
 
 			if(!is_array($data)) {
-				return array(
-					'value' => $data,
-					'handle' => Lang::createHandle($data)
-				);
+				$result['value'] = $data;
+				$result['handle'] = Lang::createHandle($data);
 			}
-
-			if(empty($data)) return null;
-
-			$result = array(
-				'value' => array(),
-				'handle' => array()
-			);
-
-			foreach($data as $value){
+			else foreach($data as $a => $value) {
 				$result['value'][] = $value;
 				$result['handle'][] = Lang::createHandle($value);
 			}
