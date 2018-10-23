@@ -6,6 +6,7 @@
 
 	require_once FACE . '/interface.exportablefield.php';
 	require_once FACE . '/interface.importablefield.php';
+	require_once(EXTENSIONS . '/remote_selectbox/lib/class.entryqueryremoteselectboxadapter.php');
 
 	require_once(EXTENSIONS . '/remote_selectbox/extension.driver.php');
 
@@ -16,6 +17,8 @@
 	class FieldRemote_Selectbox extends Field implements ExportableField, ImportableField {
 		public function __construct(){
 			parent::__construct();
+			$this->entryQueryFieldAdapter = new EntryQueryRemoteSelectboxAdapter($this);
+
 			$this->_name = __(extension_remote_selectbox::EXT_NAME);
 			$this->_required = true;
 			$this->_showassociation = false;
