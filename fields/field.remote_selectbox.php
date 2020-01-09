@@ -249,10 +249,10 @@
 			$select->setAttribute('data-required', $this->get('required') == 'yes');
 			$select->setAttribute('data-sort', $this->get('sort_options') == 'yes');
 
-			$label->appendChild($select);
 
 			if($flagWithError != null) $wrapper->appendChild(Widget::Error($label, $flagWithError));
 			else $wrapper->appendChild($label);
+			$wrapper->appendChild($select);
 		}
 
 		public function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=NULL){
